@@ -1,0 +1,272 @@
+/* =============================================================
+ * KontroCode base styles.
+ * Reset + layout shell. Component styles live in their own files.
+ * ============================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+html {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-void);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv11", "ss01", "ss03";
+}
+
+body {
+  user-select: none;
+  cursor: default;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  user-select: text;
+  cursor: text;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+  transition: background var(--t-fast) var(--ease);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+::selection {
+  background-color: var(--accent-primary);
+  color: var(--text-on-accent);
+}
+
+/* ---------- App shell ---------- */
+
+.app {
+  display: grid;
+  grid-template-rows: var(--titlebar-h) 1fr var(--statusbar-h);
+  grid-template-columns: var(--sidebar-w) 1fr var(--agentpanel-w);
+  grid-template-areas:
+    "titlebar titlebar titlebar"
+    "sidebar  main     agent"
+    "statusbar statusbar statusbar";
+  height: 100vh;
+  background: var(--bg-void);
+}
+
+.app[data-layout="no-sidebar"] {
+  grid-template-columns: 0 1fr var(--agentpanel-w);
+  grid-template-areas:
+    "titlebar titlebar titlebar"
+    ".        main     agent"
+    "statusbar statusbar statusbar";
+}
+
+.app[data-layout="no-agent"] {
+  grid-template-columns: var(--sidebar-w) 1fr 0;
+  grid-template-areas:
+    "titlebar titlebar titlebar"
+    "sidebar  main     ."
+    "statusbar statusbar statusbar";
+}
+
+.app[data-layout="focus"] {
+  grid-template-columns: 0 1fr 0;
+  grid-template-areas:
+    "titlebar titlebar titlebar"
+    ".        main     ."
+    "statusbar statusbar statusbar";
+}
+
+.titlebar {
+  grid-area: titlebar;
+  background: var(--bg-void);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  -webkit-app-region: drag;
+  font-size: 12px;
+  color: var(--text-muted);
+  gap: 12px;
+}
+
+.titlebar .window-controls {
+  -webkit-app-region: no-drag;
+  display: flex;
+  gap: 8px;
+}
+
+.titlebar .window-controls button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  transition: background var(--t-fast) var(--ease);
+}
+.titlebar .window-controls button:hover {
+  background: var(--border-subtle);
+}
+
+.titlebar .title {
+  flex: 1;
+  text-align: center;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.main {
+  grid-area: main;
+  display: grid;
+  grid-template-rows: 1fr var(--terminal-h);
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg-void);
+}
+
+.main[data-terminal-hidden="true"] {
+  grid-template-rows: 1fr 0;
+}
+
+.agent-panel {
+  grid-area: agent;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.statusbar {
+  grid-area: statusbar;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  gap: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.statusbar .status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.statusbar .status-item .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+.statusbar .status-item .dot.ok {
+  background: var(--accent-secondary);
+}
+.statusbar .status-item .dot.warn {
+  background: var(--accent-warning);
+}
+.statusbar .status-item .dot.err {
+  background: var(--accent-error);
+}
+
+/* ---------- Utility ---------- */
+
+.mono {
+  font-family: var(--font-code);
+  font-size: var(--font-size-code);
+  line-height: var(--line-height-code);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.faint {
+  color: var(--text-faint);
+}
+
+.section-header {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  transition: background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+.icon-button:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.icon-button[data-active="true"] {
+  background: var(--bg-elevated);
+  color: var(--accent-primary);
+}

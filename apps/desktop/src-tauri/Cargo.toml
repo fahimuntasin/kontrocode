@@ -1,0 +1,45 @@
+[package]
+name = "kontrocode-desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "KontroCode native desktop shell (Tauri v2)."
+
+[lib]
+name = "kontrocode_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+kontrocode-core = { workspace = true }
+kontrocode-agent = { workspace = true }
+kontrocode-router = { workspace = true }
+kontrocode-research = { workspace = true }
+kontrocode-memory = { workspace = true }
+
+tauri = { version = "2", features = ["macos-private-api", "tray-icon"] }
+tauri-plugin-shell = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-store = "2"
+
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+async-trait.workspace = true
+futures.workspace = true
+parking_lot.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+clap.workspace = true
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

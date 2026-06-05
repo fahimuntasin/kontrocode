@@ -1,0 +1,23 @@
+[package]
+name = "kontrocode-memory"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "User profile + RAG memory store for KontroCode."
+
+[dependencies]
+kontrocode-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+parking_lot.workspace = true
+
+[dev-dependencies]
+tempfile = "3.13"
