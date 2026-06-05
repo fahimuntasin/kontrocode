@@ -1,105 +1,132 @@
 # Contributing to KontroCode
 
-Thanks for wanting to make KontroCode better. This document is short on purpose — we want you shipping in 15 minutes, not reading 15 pages.
+Thank you for your interest in contributing to KontroCode, the research-first, memory-aware native coding agent.
 
-## Code of conduct
+KontroCode is a **Zed editor fork (GPUI/Rust)** with a custom **OpenCode-style agent brain (Rust)** wired via the Agent Client Protocol. This document explains how to set up your development environment.
 
-Be kind. We're all here to ship good software. Harassment, slurs, or personal attacks are not tolerated and will get you banned.
+---
 
-## Dev setup
+## Prerequisites
+
+### Rust
+
+We require Rust **1.95.0** (the same as upstream Zed). Install via [rustup](https://rustup.rs):
 
 ```bash
-# Prereqs
-rustup install stable          # Rust 1.75+
-node --version                 # Node 20+
-pnpm --version                 # pnpm 9+
-# macOS: xcode-select --install
-# Linux: sudo apt install libwebkit2gtk-4.1-dev libssl-dev
-
-# Clone & install
-git clone https://github.com/fahimuntasin/kontrocode.git
-cd kontrocode
-pnpm install
-pnpm --filter @kontrocode/desktop tauri dev
+rustup toolchain install 1.95.0
+rustup default 1.95.0
 ```
 
-## Repo layout (30-second tour)
+### System dependencies
 
-| Path | What it is |
-|------|------------|
-| `apps/desktop` | Tauri v2 native shell — UI lives here |
-| `crates/kontrocode-agent` | The OpenCode-style agent loop |
-| `crates/kontrocode-router` | Multi-provider LLM routing (9 providers) |
-| `crates/kontrocode-research` | Docs/npm/registry scrapers |
-| `crates/kontrocode-memory` | User profile + RAG store |
-| `crates/kontrocode-core` | Shared types — everyone depends on this |
-| `packages/cli` | `@kontrocode/cli` — headless agent for terminal use |
-| `docs/` | Design, architecture, roadmap |
+**Linux (Ubuntu/Debian):**
 
-**Read these first (in order):**
-1. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how it all fits together
-2. [`docs/design.md`](docs/design.md) — visual + UX rules (do not violate the theme)
-3. [`docs/ROADMAP.md`](docs/ROADMAP.md) — what's being built next, claim a phase
+```bash
+sudo apt-get install -y cmake libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+```
 
-## Branch & commit conventions
+**macOS:**
 
-- `main` is always green. No direct pushes.
-- Branch from `main`: `feat/short-name`, `fix/short-name`, `chore/short-name`
-- One logical change per PR
-- Commit messages: imperative, lowercase, ≤72 chars
-  - `feat(router): add mistral provider with cost-aware fallback`
-  - `fix(memory): resolve race in profile updater`
-  - `chore: bump tokio to 1.42`
+```bash
+xcode-select --install
+```
 
-## PR checklist
+**Windows:**
 
-- [ ] `cargo test --workspace` passes
-- [ ] `cargo clippy --workspace --all-targets -- -D warnings` clean
-- [ ] `pnpm -r test` passes
-- [ ] `pnpm -r lint` passes
-- [ ] `pnpm -r typecheck` passes
-- [ ] Public APIs have doc comments (`///`)
-- [ ] No secrets, API keys, or `.env` files committed
-- [ ] Updated relevant docs (design.md, ARCHITECTURE.md, etc.) if behavior changed
-- [ ] If you changed the UI, attached a screenshot or short clip
+Install [Visual Studio 2022 Build Tools](https://visualstudio.microsoft.com/downloads/) with the "Desktop development with C++" workload and the Windows 11 SDK.
 
-## Coding rules
+---
 
-- **Rust:** Edition 2021. `unsafe` only with a `// SAFETY:` comment. No `unwrap()` outside tests — use `?` or `anyhow!`/`thiserror`.
-- **TypeScript:** Strict mode. No `any`. Prefer `unknown` + narrowing. Zod for runtime validation at boundaries.
-- **Errors:** `Result<T, E>` everywhere in Rust. Never swallow. Never `panic!` in library code.
-- **Async:** `tokio` in Rust. `never` block the runtime. Use `tokio::join!` for parallel work.
-- **Tests:** Unit tests next to code (`#[cfg(test)] mod tests`). Integration tests in `tests/`. Frontend: Vitest. Aim for >80% on shared crates, >60% everywhere else.
-- **Comments:** Code explains *why*, not *what*. No banner comments. No dead code — delete it.
-- **Logging:** `tracing` in Rust, structured fields. Never `println!` in library code.
+## Repository layout
 
-## Adding a new LLM provider
+```
+kontrocode/
+├── zed/              Zed editor fork (GPUI) — see upstream README in zed/
+├── crates/           KontroCode agentic backend (Rust)
+│   ├── kontrocode-core/
+│   ├── kontrocode-agent/
+│   ├── kontrocode-router/
+│   ├── kontrocode-research/
+│   └── kontrocode-memory/
+├── docs/             Architecture, roadmap, design spec
+└── Cargo.toml        Root workspace (backend crates only)
+```
 
-1. Add a config struct in `crates/kontrocode-router/src/providers/<name>.rs`
-2. Implement the `Provider` trait (see `providers/anthropic.rs` as the reference)
-3. Register it in `crates/kontrocode-router/src/registry.rs`
-4. Add the env var to `.env.example` and `README.md`
-5. Add a test in `crates/kontrocode-router/tests/<name>_test.rs` using a recorded HTTP fixture
-6. Open PR — CI will run a smoke test against the real API
+There are **two** Cargo workspaces:
 
-## Adding a new research source
+- **Root** `Cargo.toml` — our 5 `kontrocode-*` crates (the agentic backend). These are fast to build (~5 min cold, ~10 s warm).
+- **`zed/Cargo.toml`** — Zed's ~230 crates (the editor). This is a full-featured GPUI editor and requires all Zed system dependencies. First build: ~30–60 min.
 
-1. Add a fetcher in `crates/kontrocode-research/src/sources/<name>.rs`
-2. Implement the `ResearchSource` trait
-3. Add it to the parallel `tokio::join!` in `crates/kontrocode-research/src/runner.rs`
-4. Add a fixture test in `tests/fixtures/`
-5. Document the source in `docs/ARCHITECTURE.md` § Research
+The two are separate by design. See `docs/ARCHITECTURE.md` §7 for why.
 
-## Issues & discussions
+---
 
-- **Bug reports:** Use the bug report template. Include OS, KontroCode version, repro steps, and a minimal repro.
-- **Feature requests:** Use the feature template. We accept very few of these — pitch the *problem* first, the *solution* second.
-- **Questions:** GitHub Discussions, not issues.
+## Quick start
 
-## Review SLA
+### 1. Build and test the backend
 
-We try to review every PR within 48 hours. If you don't hear back, ping us on Discord.
+```bash
+cd kontrocode
+cargo build --workspace
+cargo test --workspace           # 72 tests across 5 crates
+cargo clippy --workspace --all-targets -- -D warnings
+```
+
+### 2. Build the editor (Zed fork)
+
+```bash
+cd zed
+cargo run --bin kontrocode       # opens KontroCode editor window
+```
+
+### 3. Run the agentic brain
+
+```bash
+cd kontrocode
+cargo run --bin kontrocode-agent ask "build me a Flutter auth screen with Google Sign-In"
+```
+
+The agent connects to the editor over the Agent Client Protocol (ACP) — JSON-RPC over stdio (which on Linux/macOS is a `socketpair`, on Windows a named pipe). When both are running, the editor's agent panel will stream responses from our `kontrocode-agent`.
+
+---
+
+## Development workflow
+
+### Backend (crates/)
+
+```
+cargo test --workspace
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --all
+```
+
+### Editor (zed/)
+
+```
+cd zed
+cargo check --bin kontrocode
+cargo clippy --workspace --all-targets
+```
+
+---
+
+## PR guidelines
+
+1. Use a clear, imperative PR title.
+2. Include a `Release Notes:` section at the bottom of the PR body.
+3. Use `Release Notes: - N/A` for docs-only or non-user-facing changes.
+4. If changes touch both the editor and the backend, describe the IPC interaction.
+
+---
+
+## Code of Conduct
+
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) (Zed's upstream CoC applies to the `zed/` subtree; KontroCode-authored code follows it by reference).
+
+---
 
 ## License
 
-By contributing, you agree your contributions are MIT-licensed.
+KontroCode-authored code under `crates/`, `docs/`, and root configuration files is MIT-licensed.
+
+The `zed/` subtree remains under the upstream Apache 2.0 + GPL 3.0 dual license. See [`zed/LICENSE-APACHE`](zed/LICENSE-APACHE) and [`zed/LICENSE-GPL`](zed/LICENSE-GPL).

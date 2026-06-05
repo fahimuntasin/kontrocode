@@ -6,8 +6,12 @@ members = [
     "crates/kontrocode-router",
     "crates/kontrocode-research",
     "crates/kontrocode-memory",
-    "apps/desktop/src-tauri",
 ]
+
+# Zed is a separately-versioned subproject with its own Cargo workspace.
+# Build it via:  cd zed && cargo build
+# The two workspaces are intentionally NOT merged: Zed ships as a
+# contiguous fork and our crates are versioned independently.
 
 [workspace.package]
 version = "0.1.0"

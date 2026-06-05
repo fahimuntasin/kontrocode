@@ -1,25 +1,20 @@
-# Dependencies
-node_modules/
-.pnpm-store/
-
-# Build outputs
-dist/
-build/
+# Build output
 target/
+dist/
 out/
 *.tsbuildinfo
 
-# Tauri
-apps/desktop/src-tauri/target/
-apps/desktop/src-tauri/gen/
+# Zed artifacts (build outputs, not source)
+zed/target/
+zed/target-*/
+zed/script/
+zed/.zed/
 
 # Environment
 .env
-.env.local
-.env.*.local
-!.env.example
+.env.*
 
-# Secrets — never commit
+# Secrets
 *.pem
 *.key
 *.p12
@@ -27,10 +22,7 @@ secrets/
 
 # IDE
 .idea/
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-!.vscode/launch.json
+.vscode/
 *.swp
 *.swo
 .DS_Store
@@ -39,24 +31,9 @@ Thumbs.db
 # Logs
 *.log
 logs/
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Test coverage
 coverage/
-*.lcov
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Desktop.ini
 
 # KontroCode local state
 .kontrocode/
-*.kontrocode

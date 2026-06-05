@@ -12,17 +12,17 @@ Faster than Cursor. Smarter than Copilot. **Never ships deprecated code.**
 
 KontroCode is a research-first, memory-aware, native coding agent. It is not a chatbot.
 
-It is an autonomous agent loop that:
+It is a **fork of the Zed editor** (GPUI, Rust) with a custom **OpenCode-style agent brain** (also Rust) wired over the Agent Client Protocol — Zed's standard interface for talking to external agent servers. The result is a single Rust codebase that ships as a native desktop app on macOS, Windows, and Linux, with a sub-200 MB idle footprint.
+
+It:
 
 1. **Listens** to your prompt and detects intent, language, framework.
-2. **Researches** the live ecosystem — official docs, package registries (pub.dev / npm / crates.io), GitHub signals, Stack Overflow recency — in parallel.
+2. **Researches** the live ecosystem — official docs, package registries, GitHub signals, Stack Overflow recency — in parallel.
 3. **Decides** which library, version, and pattern to use, with a confidence score.
 4. **Generates** code using only current, non-deprecated APIs.
 5. **Validates** imports, version conflicts, and patterns.
 6. **Streams** the result into the editor.
 7. **Learns** from your behavior in the background — building a profile you never have to fill in.
-
-It runs as a **native desktop app** (Tauri v2 + Rust + TypeScript). No Electron. No terminal-only trade-off.
 
 ---
 
@@ -30,25 +30,24 @@ It runs as a **native desktop app** (Tauri v2 + Rust + TypeScript). No Electron.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│  apps/desktop  (Tauri v2 — native shell)                   │
+│  zed/  — Zed editor fork (GPUI, Rust)                      │
 │  ┌─────────────┬──────────────────┬────────────────────┐    │
-│  │ File tree   │  Monaco editor   │  Agent panel       │    │
-│  │ (left)      │  (center)        │  (right)           │    │
-│  │             │                  │  - chat            │    │
+│  │ File tree   │  GPUI editor     │  Agent panel       │    │
+│  │ + git (L)   │  KontroCode      │  (R, docked)       │    │
+│  │             │  syntax theme    │  - chat            │    │
 │  │             │                  │  - research feed   │    │
-│  │             │                  │  - memory panel    │    │
-│  │             ├──────────────────┤                    │    │
-│  │             │  Terminal (xterm)│                    │    │
+│  │             ├──────────────────┤  - memory panel    │    │
+│  │             │  Zed terminal    │                    │    │
 │  └─────────────┴──────────────────┴────────────────────┘    │
-│                       │ Tauri IPC                          │
+│                       │ Agent Client Protocol (stdin/stdout)│
 └───────────────────────┼────────────────────────────────────┘
                         ▼
 ┌────────────────────────────────────────────────────────────┐
-│  crates/kontrocode-agent   — OpenCode-style agent loop     │
+│  crates/kontrocode-agent    — OpenCode-style agent loop     │
 │  crates/kontrocode-research — docs/npm/registry scrapers   │
-│  crates/kontrocode-router  — multi-provider LLM routing   │
-│  crates/kontrocode-memory  — profile + RAG                 │
-│  crates/kontrocode-core    — shared types, config, errors  │
+│  crates/kontrocode-router   — multi-provider LLM routing   │
+│  crates/kontrocode-memory   — profile + RAG                 │
+│  crates/kontrocode-core     — shared types, config, errors  │
 └────────────────────────────────────────────────────────────┘
                         │
                         ▼
@@ -60,47 +59,60 @@ It runs as a **native desktop app** (Tauri v2 + Rust + TypeScript). No Electron.
         └───────────────────────────────┘
 ```
 
+The Agent Client Protocol is what `crates/agent_servers` already speaks in upstream Zed. We register our `kontrocode-agent` binary as the default server, so when the user opens the agent panel, Zed spawns our process and streams JSON-RPC over its stdio (which on Linux/macOS is a Unix socket pair from `socketpair`, and on Windows is a named pipe via ConPTY — the **IPC** described in PRD §2.2).
+
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full breakdown.
 
 ---
 
 ## Status
 
-**Phase 1** of 8 — *Zed-equivalent native shell with KontroCode theme + OpenCode-style agent wired via IPC.*
+**Phase 1** of 8 — *Zed fork with KontroCode theme + OpenCode-style agent wired via Agent Client Protocol.*
 
 | Phase | Deliverable                                         | Status |
 |-------|-----------------------------------------------------|--------|
-| 1     | Native shell + theme + agent + IPC                  | **In progress** |
+| 1     | Zed fork + KontroCode theme + agent + IPC          | **In progress** |
 | 2     | Multi-provider backend (9 providers, routing)       | Planned |
 | 3     | Research agent (docs, package ranker, deprecation)  | Planned |
 | 4     | Memory system (Redis profile, RAG, background)      | Planned |
 | 5     | Decision engine + code validator                    | Planned |
 | 6     | UI polish (research feed, memory panel)             | Planned |
-| 7     | Billing + accounts + auto-updater                   | Planned |
+| 7     | Billing + accounts + Tauri v2 packaging             | Planned |
 | 8     | Benchmarks vs Cursor                                | Planned |
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ---
 
-## Quick start (Phase 1 dev)
+## Quick start
+
+### Build the Zed-fork editor (Phase 1)
 
 ```bash
-# Prereqs: Rust 1.95+, Node 20+, pnpm 9+, Tauri v2 deps
 git clone https://github.com/fahimuntasin/kontrocode.git
 cd kontrocode
-pnpm install
-pnpm --filter @kontrocode/desktop tauri dev
+cd zed
+cargo run --release --bin kontrocode
 ```
 
-The first build is slow (Rust compilation). Subsequent runs are fast.
+The first build compiles ~230 Rust crates. Expect 30–60 minutes on a modern machine.
 
-### CLI (headless agent)
+### Build the agentic backend
 
 ```bash
-# After publish:
-npx @kontrocode/cli "build me a Flutter auth screen with Google Sign-In"
+# In a separate terminal, from repo root:
+cargo build --release --workspace
+./target/release/kontrocode-agent --help
 ```
+
+### Run with the editor pointing at the local agent
+
+```bash
+cd zed
+KONTROCODE_AGENT_BIN=$(pwd)/../target/release/kontrocode-agent cargo run --bin kontrocode
+```
+
+When you open the KontroCode Agent panel (Cmd+? or via the command palette), Zed will spawn our agent process. Our agent's CLI speaks the Agent Client Protocol and uses our own `kontrocode-research`, `kontrocode-router`, and `kontrocode-memory` crates for the intelligence layer.
 
 ---
 
@@ -108,41 +120,28 @@ npx @kontrocode/cli "build me a Flutter auth screen with Google Sign-In"
 
 ```
 kontrocode/
-├── apps/
-│   └── desktop/              Tauri v2 native shell
-│       ├── src/              TypeScript + Solid frontend
-│       └── src-tauri/        Rust shell
-├── crates/                   Rust workspace
-│   ├── kontrocode-core/      Shared types, config, errors
-│   ├── kontrocode-agent/     OpenCode-style agent loop
-│   ├── kontrocode-research/  Docs / package scrapers
-│   ├── kontrocode-router/    Multi-provider LLM routing
-│   └── kontrocode-memory/    Profile + RAG store
-├── packages/
-│   └── cli/                  @kontrocode/cli (Node headless)
+├── zed/                         Zed editor fork (GPUI, Rust)
+│   ├── crates/                  230+ Zed crates (editor, LSP, terminal, …)
+│   ├── assets/themes/kontrocode/  KontroCode dark theme
+│   └── Cargo.toml               Zed workspace
+├── crates/                      KontroCode agentic backend
+│   ├── kontrocode-core/         Shared types, config, errors
+│   ├── kontrocode-agent/        OpenCode-style agent loop + ACP server
+│   ├── kontrocode-research/     Docs / package scrapers
+│   ├── kontrocode-router/       Multi-provider LLM routing
+│   └── kontrocode-memory/       Profile + RAG store
 ├── docs/
-│   ├── design.md             Visual + UX design spec
-│   ├── ARCHITECTURE.md       System architecture
-│   └── ROADMAP.md            Build phases
-├── Cargo.toml                Rust workspace
-├── pnpm-workspace.yaml       Node workspace
-└── package.json              Root scripts
+│   ├── design.md                Visual + UX design spec
+│   ├── ARCHITECTURE.md          System architecture
+│   └── ROADMAP.md               Build phases
+├── Cargo.toml                   KontroCode-only workspace
+└── README.md
 ```
 
+The two Cargo workspaces (root + `zed/`) are intentionally separate. Zed is shipped as a contiguous fork and evolves at its own cadence; our `kontrocode-*` crates are versioned independently.
+
 ---
-
-## Contributing
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md). All PRs go through CI (cargo test, pnpm test, pnpm lint).
-
-## Security
-
-See [`SECURITY.md`](SECURITY.md). Report vulnerabilities to **security@kontrocode.dev** (or open a private advisory on GitHub).
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
-
----
-
-Built by the KontroCode team. *Knows before it codes.*
+MIT for the KontroCode-authored code under `crates/` and `docs/`. The `zed/` subtree remains under the upstream Apache 2.0 + GPL 3.0 dual license — see [`zed/LICENSE-APACHE`](zed/LICENSE-APACHE) and [`zed/LICENSE-GPL`](zed/LICENSE-GPL).
