@@ -9,10 +9,7 @@ use parking_lot::Mutex;
 /// Minimal interface a cache must provide to the research sources.
 pub trait CacheKey: Send + Sync {
     /// Build a deterministic key for a (source, stack, topic) tuple.
-    fn key(source: &str, stack: &str, topic: &str) -> String
-    where
-        Self: Sized,
-    {
+    fn key(&self, source: &str, stack: &str, topic: &str) -> String {
         format!("research:{source}:{stack}:{}", normalize(topic))
     }
 }
@@ -118,8 +115,8 @@ mod tests {
 
     #[test]
     fn key_is_deterministic_and_normalized() {
-        let k1 = InMemoryCache::key("src", "stack", "Hello World!");
-        let k2 = InMemoryCache::key("src", "stack", "hello world!");
+        let k1 = InMemoryCache::default_ttl().key("src", "stack", "Hello World!");
+        let k2 = InMemoryCache::default_ttl().key("src", "stack", "hello world!");
         assert_eq!(k1, k2);
         assert!(k1.starts_with("research:src:stack:"));
     }

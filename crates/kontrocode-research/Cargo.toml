@@ -8,6 +8,7 @@ description = "Research agent: parallel docs, package registry, and community si
 
 [dependencies]
 kontrocode-core.workspace = true
+reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

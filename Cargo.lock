@@ -999,6 +999,7 @@ dependencies = [
  "futures",
  "kontrocode-core",
  "parking_lot",
+ "reqwest",
  "serde",
  "serde_json",
  "tempfile",

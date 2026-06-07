@@ -109,7 +109,7 @@ impl ResearchRunner {
             let topic = topic.to_string();
             let cache = cache.clone();
             async move {
-                let key = InMemoryCache::key(source.id(), &stack.to_string(), &topic);
+                let key = InMemoryCache::default_ttl().key(source.id(), &stack.to_string(), &topic);
                 if let Some(hit) = cache.get(&key) {
                     return (source.id(), Ok(hit));
                 }
