@@ -17,6 +17,7 @@
 
 pub mod mock;
 pub mod provider;
+pub mod providers;
 pub mod registry;
 pub mod router;
 pub mod scorer;
