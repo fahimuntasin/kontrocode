@@ -109,6 +109,29 @@ impl MemoryStore for FileMemoryStore {
     fn location(&self) -> String {
         Path::new(&self.path).display().to_string()
     }
+
+    async fn search_facts(&self, query: &str, top_k: usize) -> Result<Vec<Fact>> {
+        let profile = self.load().await?;
+        let query_lower = query.to_lowercase();
+        let query_words: Vec<&str> = query_lower.split_whitespace().collect();
+        let mut scored: Vec<(f64, Fact)> = profile
+            .facts
+            .into_iter()
+            .map(|f| {
+                let text_lower = f.text.to_lowercase();
+                let exact = if text_lower.contains(&query_lower) { 2.0 } else { 0.0 };
+                let word_hits = query_words
+                    .iter()
+                    .filter(|w| text_lower.contains(**w))
+                    .count() as f64;
+                let score = (exact + word_hits * 0.5) * f.confidence as f64;
+                (score, f)
+            })
+            .filter(|(s, _)| *s > 0.0)
+            .collect();
+        scored.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
+        Ok(scored.into_iter().take(top_k).map(|(_, f)| f).collect())
+    }
 }
 
 #[cfg(test)]

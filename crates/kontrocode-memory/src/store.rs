@@ -23,6 +23,11 @@ pub trait MemoryStore: Send + Sync {
     /// Add a new fact. Caller is responsible for dedup / confidence.
     async fn add_fact(&self, fact: Fact) -> Result<()>;
 
+    /// Search facts by text similarity. Returns top-K matches sorted by relevance.
+    /// Phase 4 default: simple substring + keyword overlap scoring.
+    /// Phase 4 Redis: cosine similarity via RediSearch.
+    async fn search_facts(&self, query: &str, top_k: usize) -> Result<Vec<Fact>>;
+
     /// The path or address of the underlying storage. For diagnostics.
     fn location(&self) -> String;
 }
