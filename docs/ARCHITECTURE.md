@@ -185,6 +185,8 @@ pub trait Tool: Send + Sync {
 
 Phase 1 ships `MockProvider`, `FileMemoryStore`, `NullSource`, and three tools (`file_read`, `file_write`, `shell_run`). Phase 2+ swaps `MockProvider` for real Anthropic / Groq / xAI / Google / OpenAI / DeepSeek / Mistral / Together / Fireworks implementations behind the same trait; Phase 4 swaps `FileMemoryStore` for Redis; Phase 3 adds real research sources.
 
+The ACP agent binary (`kontrocode-agent acp`) is implemented in `crates/kontrocode-agent/src/acp.rs` and tested against the JSON-RPC wire format. It accepts `initialize`, `session/new`, and can be registered as a custom agent server in the Zed fork via settings.
+
 The editor never sees any of this. It only sees JSON-RPC over ACP.
 
 ---
