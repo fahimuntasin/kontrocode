@@ -320,6 +320,16 @@ fn is_blocked(command: &str, _args: &[String]) -> Option<&'static str> {
     }
 }
 
+/// Create the default tool set used in Phase 1: file_read, file_write, shell_run.
+pub fn default_tools() -> Vec<std::sync::Arc<dyn Tool>> {
+    let root = std::env::current_dir().unwrap_or_default();
+    vec![
+        std::sync::Arc::new(FileReadTool::new(&root)),
+        std::sync::Arc::new(FileWriteTool::new(&root)),
+        std::sync::Arc::new(ShellRunTool::new(&root, 300_000)),
+    ]
+}
+
 /// Convenience: dispatch a [`ToolCall`] to the matching tool in a list.
 pub async fn dispatch(tools: &[std::sync::Arc<dyn Tool>], call: &ToolCall) -> Result<ToolResult> {
     let tool = tools

@@ -55,6 +55,9 @@ reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-feature
 # CLI
 clap = { version = "4.5", features = ["derive", "env"] }
 
+# Agent Client Protocol
+agent-client-protocol = { version = "0.13", features = ["unstable"] }
+
 # Internal
 kontrocode-core = { path = "crates/kontrocode-core" }
 kontrocode-agent = { path = "crates/kontrocode-agent" }
