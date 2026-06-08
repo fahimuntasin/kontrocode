@@ -19,3 +19,4 @@ pub use decay::apply_decay;
 pub use file_store::FileMemoryStore;
 pub use signal::{Signal, SignalKind};
 pub use store::MemoryStore;
+pub mod collector;
