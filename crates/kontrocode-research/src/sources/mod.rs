@@ -3,3 +3,4 @@ mod real;
 
 pub use null::*;
 pub use real::*;
+mod docs;

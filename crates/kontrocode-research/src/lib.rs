@@ -19,3 +19,5 @@ pub mod sources;
 pub use cache::InMemoryCache;
 pub use runner::{ResearchRunner, ResearchRunnerConfig};
 pub use sources::{NullSource, ResearchSource};
+pub mod version_resolver;
+pub mod feed;
