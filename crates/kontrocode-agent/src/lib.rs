@@ -23,3 +23,5 @@ pub mod tools;
 
 pub use loop_::{Agent, AgentConfig, AgentOutput};
 pub use stream::{AgentEvent, StreamSender};
+pub mod hooks;
+pub mod rules;
