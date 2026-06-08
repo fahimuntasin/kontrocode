@@ -452,3 +452,35 @@ pub fn create_anthropic() -> Option<GenericProvider> {
         model_map: identity_model,
     })
 }
+
+pub fn together_models() -> Vec<ModelSpec> {
+    vec![
+        ModelSpec { id: ModelId::new("together", "llama-3.1-405b"), display_name: "Llama 3.1 405B".into(), context_window: 128_000, max_output_tokens: 4_096, input_price_per_mtok: 2.5, output_price_per_mtok: 2.5, supports_tools: true, supports_streaming: true, supports_vision: false },
+        ModelSpec { id: ModelId::new("together", "mixtral-8x22b"), display_name: "Mixtral 8x22B".into(), context_window: 65_536, max_output_tokens: 4_096, input_price_per_mtok: 0.9, output_price_per_mtok: 0.9, supports_tools: true, supports_streaming: true, supports_vision: false },
+    ]
+}
+
+
+pub fn fireworks_models() -> Vec<ModelSpec> {
+    vec![
+        ModelSpec { id: ModelId::new("fireworks", "llama-v3p1-70b"), display_name: "Llama 3.1 70B".into(), context_window: 128_000, max_output_tokens: 4_096, input_price_per_mtok: 0.9, output_price_per_mtok: 0.9, supports_tools: true, supports_streaming: true, supports_vision: false },
+        ModelSpec { id: ModelId::new("fireworks", "mixtral-8x7b"), display_name: "Mixtral 8x7B".into(), context_window: 32_768, max_output_tokens: 4_096, input_price_per_mtok: 0.5, output_price_per_mtok: 0.5, supports_tools: true, supports_streaming: true, supports_vision: false },
+    ]
+}
+
+
+pub fn create_together() -> Option<GenericProvider> {
+    GenericProvider::from_env(ProviderConfig {
+        id: "together", api_url: "https://api.together.xyz/v1/chat/completions",
+        api_key_env: "TOGETHER_API_KEY", header_name: "Authorization",
+        header_value_prefix: "Bearer ", models_spec: together_models(), model_map: identity_model,
+    })
+}
+
+pub fn create_fireworks() -> Option<GenericProvider> {
+    GenericProvider::from_env(ProviderConfig {
+        id: "fireworks", api_url: "https://api.fireworks.ai/inference/v1/chat/completions",
+        api_key_env: "FIREWORKS_API_KEY", header_name: "Authorization",
+        header_value_prefix: "Bearer ", models_spec: fireworks_models(), model_map: identity_model,
+    })
+}

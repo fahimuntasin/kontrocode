@@ -28,3 +28,4 @@ pub use provider::Provider;
 pub use registry::ProviderRegistry;
 pub use router::{Router, RouterConfig, RouterEvent};
 pub use scorer::{ScoredModel, ScoringCriteria, TaskComplexity};
+pub mod monitor;

@@ -18,3 +18,4 @@ async-trait.workspace = true
 tokio.workspace = true
 futures.workspace = true
 chrono.workspace = true
+parking_lot.workspace = true
