@@ -20,3 +20,4 @@ pub use file_store::FileMemoryStore;
 pub use signal::{Signal, SignalKind};
 pub use store::MemoryStore;
 pub mod collector;
+pub mod enhanced;
