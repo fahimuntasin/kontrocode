@@ -30,3 +30,4 @@ pub mod bugbot;
 pub mod diff;
 pub mod completion;
 pub mod multi_agent;
+pub mod capabilities;
