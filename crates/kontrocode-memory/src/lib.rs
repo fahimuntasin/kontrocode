@@ -11,6 +11,7 @@
 
 pub mod decay;
 pub mod file_store;
+pub mod redis_store;
 pub mod signal;
 pub mod store;
 
