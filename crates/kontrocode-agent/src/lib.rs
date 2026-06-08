@@ -33,3 +33,4 @@ pub mod multi_agent;
 pub mod capabilities;
 pub mod mission_control;
 pub mod codegen;
+pub mod platform;
