@@ -31,3 +31,4 @@ pub mod diff;
 pub mod completion;
 pub mod multi_agent;
 pub mod capabilities;
+pub mod mission_control;

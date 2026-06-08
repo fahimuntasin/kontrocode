@@ -109,25 +109,31 @@ pub struct ContextCompactor {
     max_tokens: usize,
     keep_system: bool,
     keep_last_n: usize,
+    compact_count: usize,
 }
 
 impl ContextCompactor {
     pub fn new(max_tokens: usize) -> Self {
-        Self { max_tokens, keep_system: true, keep_last_n: 5 }
+        Self { max_tokens, keep_system: true, keep_last_n: 5, compact_count: 0 }
     }
 
-    pub fn compact(&self, messages: &[String], system_prompt: &str) -> Vec<String> {
-        let total_tokens: usize = messages.iter().map(|m| m.len() / 4).sum();
-        if total_tokens <= self.max_tokens {
+    pub fn compact(&mut self, messages: &[String], system_prompt: &str) -> Vec<String> {
+        let total_tokens: usize = messages.iter().map(|m| Self::estimate_tokens(m)).sum();
+        let sys_tokens = Self::estimate_tokens(system_prompt);
+        let available = self.max_tokens.saturating_sub(sys_tokens);
+
+        if total_tokens <= available {
             return messages.to_vec();
         }
 
+        self.compact_count += 1;
         let mut compacted: Vec<String> = Vec::new();
         if self.keep_system {
             compacted.push(format!("[system]: {system_prompt}"));
         }
 
-        compacted.push("[Context compacted — earlier messages summarized]".into());
+        let summary = self.summarize_older(messages, available, messages.len().saturating_sub(self.keep_last_n));
+        compacted.push(format!("[auto-compact #{}]: {summary}", self.compact_count));
 
         let start = if messages.len() > self.keep_last_n {
             messages.len() - self.keep_last_n
@@ -141,8 +147,38 @@ impl ContextCompactor {
         compacted
     }
 
+    fn summarize_older(&self, messages: &[String], budget: usize, count: usize) -> String {
+        let mut summary = String::from("Earlier messages (summarized): ");
+        let mut items = Vec::new();
+        for msg in messages.iter().take(count) {
+            if msg.contains("```") {
+                items.push("code block".to_string());
+            } else if msg.contains("error") {
+                items.push(format!("error: {}", &msg[..msg.len().min(80)]));
+            } else if msg.len() < 100 {
+                items.push(msg.clone());
+            } else {
+                items.push(format!("{}...", &msg[..80]));
+            }
+        }
+        summary.push_str(&items.join(" | "));
+        if Self::estimate_tokens(&summary) > budget {
+            summary = format!("Earlier {} messages condensed", count);
+        }
+        summary
+    }
+
     pub fn estimate_tokens(text: &str) -> usize {
         text.len() / 4
+    }
+
+    pub fn needs_compaction(&self, messages: &[String]) -> bool {
+        let total: usize = messages.iter().map(|m| Self::estimate_tokens(m)).sum();
+        total > self.max_tokens
+    }
+
+    pub fn compact_count(&self) -> usize {
+        self.compact_count
     }
 }
 
