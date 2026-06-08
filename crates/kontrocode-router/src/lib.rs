@@ -29,3 +29,4 @@ pub use registry::ProviderRegistry;
 pub use router::{Router, RouterConfig, RouterEvent};
 pub use scorer::{ScoredModel, ScoringCriteria, TaskComplexity};
 pub mod monitor;
+pub mod auto_connect;
