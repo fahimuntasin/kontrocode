@@ -1,0 +1,48 @@
+{
+  "name": "kontrocode-vscode",
+  "displayName": "KontroCode",
+  "description": "Research-first, memory-aware AI coding agent for VS Code",
+  "version": "0.1.0",
+  "publisher": "kontrocode",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Machine Learning", "Programming Languages"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "kontrocode.ask", "title": "Ask KontroCode" },
+      { "command": "kontrocode.review", "title": "Review with BugBot" },
+      { "command": "kontrocode.explain", "title": "Explain This Code" },
+      { "command": "kontrocode.generateTests", "title": "Generate Tests" },
+      { "command": "kontrocode.fixIssues", "title": "Fix Issues" }
+    ],
+    "keybindings": [
+      { "command": "kontrocode.ask", "key": "ctrl+shift+k", "mac": "cmd+shift+k" },
+      { "command": "kontrocode.explain", "key": "ctrl+shift+e", "mac": "cmd+shift+e" }
+    ],
+    "configuration": {
+      "title": "KontroCode",
+      "properties": {
+        "kontrocode.agentPath": {
+          "type": "string",
+          "default": "kontrocode-agent",
+          "description": "Path to kontrocode-agent binary"
+        },
+        "kontrocode.autoComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable inline ghost text completions"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -watch"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.6.0",
+    "vscode": "^1.1.37"
+  }
+}
