@@ -27,3 +27,4 @@ pub mod hooks;
 pub mod rules;
 pub mod mcp_runtime;
 pub mod bugbot;
+pub mod diff;
