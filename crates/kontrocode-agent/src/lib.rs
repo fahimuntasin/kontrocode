@@ -28,3 +28,5 @@ pub mod rules;
 pub mod mcp_runtime;
 pub mod bugbot;
 pub mod diff;
+pub mod completion;
+pub mod multi_agent;
