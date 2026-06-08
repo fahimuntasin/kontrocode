@@ -259,3 +259,4 @@ mod tests {
         assert!(p.ends_with("kontrocode/config.toml"));
     }
 }
+pub mod mcp;

@@ -1,0 +1,120 @@
+{
+  "servers": {
+    "filesystem": {
+      "name": "Filesystem",
+      "description": "Read, write, and manage files on the local filesystem",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-filesystem", "/path/to/allowed/dir"]
+    },
+    "github": {
+      "name": "GitHub",
+      "description": "Manage repositories, issues, PRs, and search code",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-github"],
+      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" }
+    },
+    "postgres": {
+      "name": "PostgreSQL",
+      "description": "Query and manage PostgreSQL databases",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-postgres"],
+      "env": { "DATABASE_URL": "${DATABASE_URL}" }
+    },
+    "supabase": {
+      "name": "Supabase",
+      "description": "Full Supabase integration: auth, DB, storage, edge functions",
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase"],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}"
+      }
+    },
+    "brave_search": {
+      "name": "Brave Search",
+      "description": "Web search via Brave Search API for research",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-brave-search"],
+      "env": { "BRAVE_API_KEY": "${BRAVE_API_KEY}" }
+    },
+    "puppeteer": {
+      "name": "Puppeteer",
+      "description": "Browser automation for web scraping and testing",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-puppeteer"]
+    },
+    "memory": {
+      "name": "Memory",
+      "description": "Persistent knowledge graph for long-term memory",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-memory"]
+    },
+    "sequential_thinking": {
+      "name": "Sequential Thinking",
+      "description": "Multi-step reasoning for complex problems",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-sequential-thinking"]
+    },
+    "google_maps": {
+      "name": "Google Maps",
+      "description": "Geocoding, directions, and places search",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-google-maps"],
+      "env": { "GOOGLE_MAPS_API_KEY": "${GOOGLE_MAPS_API_KEY}" }
+    },
+    "slack": {
+      "name": "Slack",
+      "description": "Send messages and manage Slack channels",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-slack"],
+      "env": { "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}" }
+    },
+    "docker": {
+      "name": "Docker",
+      "description": "Manage containers, images, and compose stacks",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-docker"]
+    },
+    "playwright": {
+      "name": "Playwright",
+      "description": "E2E testing and browser automation",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-playwright"]
+    },
+    "sqlite": {
+      "name": "SQLite",
+      "description": "Query and manage local SQLite databases",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-sqlite", "/path/to/db.sqlite"]
+    },
+    "linear": {
+      "name": "Linear",
+      "description": "Project management: issues, sprints, and roadmaps",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-linear"],
+      "env": { "LINEAR_API_KEY": "${LINEAR_API_KEY}" }
+    },
+    "notion": {
+      "name": "Notion",
+      "description": "Read, create, and update Notion pages and databases",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-notion"],
+      "env": { "NOTION_API_KEY": "${NOTION_API_KEY}" }
+    },
+    "vercel": {
+      "name": "Vercel",
+      "description": "Deploy projects, manage domains, and check build status",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-vercel"],
+      "env": { "VERCEL_TOKEN": "${VERCEL_TOKEN}" }
+    },
+    "resend": {
+      "name": "Resend",
+      "description": "Send transactional emails via Resend API",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-resend"],
+      "env": { "RESEND_API_KEY": "${RESEND_API_KEY}" }
+    }
+  }
+}

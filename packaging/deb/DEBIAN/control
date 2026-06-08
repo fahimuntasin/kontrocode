@@ -1,0 +1,13 @@
+Package: kontrocode
+Version: 0.1.0
+Section: devel
+Priority: optional
+Architecture: amd64
+Depends: libwebkit2gtk-4.1-0, libgtk-3-0, libglib2.0-0
+Maintainer: KontroCode Team <team@kontrocode.dev>
+Description: Research-first, memory-aware native coding agent
+ KontroCode is a native PC coding agent that researches official docs,
+ package registries, and community signals before generating code.
+ .
+ Built on a Zed editor fork (GPUI/Rust) with an OpenCode-style agent brain.
+ Faster than Cursor, smarter than Copilot, never ships deprecated code.

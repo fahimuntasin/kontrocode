@@ -1,0 +1,96 @@
+{
+  "templates": {
+    "supabase-nextjs": {
+      "name": "Supabase + Next.js",
+      "description": "Full-stack SaaS starter with Supabase auth, DB, storage, and Next.js App Router",
+      "stack": "nextjs",
+      "category": "fullstack",
+      "featured": true,
+      "command": "npx",
+      "args": ["create-next-app@latest", "--example", "with-supabase"],
+      "env": {
+        "NEXT_PUBLIC_SUPABASE_URL": "${SUPABASE_URL}",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}"
+      },
+      "mcp_required": ["supabase"]
+    },
+    "supabase-flutter": {
+      "name": "Supabase + Flutter",
+      "description": "Flutter app with Supabase backend: auth, realtime, and storage",
+      "stack": "flutter",
+      "category": "mobile",
+      "featured": true,
+      "command": "flutter",
+      "args": ["create", "--template=package", "--platforms=ios,android,web"],
+      "mcp_required": ["supabase"]
+    },
+    "nextjs-starter": {
+      "name": "Next.js Starter",
+      "description": "Modern Next.js 14+ with App Router, TypeScript, and Tailwind CSS",
+      "stack": "nextjs",
+      "category": "frontend",
+      "featured": true,
+      "command": "npx",
+      "args": ["create-next-app@latest", "--typescript", "--tailwind", "--eslint", "--app", "--src-dir"]
+    },
+    "flutter-starter": {
+      "name": "Flutter Starter",
+      "description": "Production-ready Flutter app with Riverpod, go_router, and Material 3",
+      "stack": "flutter",
+      "category": "mobile",
+      "featured": true,
+      "command": "flutter",
+      "args": ["create", "--org=com.kontrocode", "--project-name=app"]
+    },
+    "fastapi-starter": {
+      "name": "FastAPI Backend",
+      "description": "Python FastAPI backend with SQLAlchemy, Alembic, and JWT auth",
+      "stack": "python",
+      "category": "backend",
+      "featured": true
+    },
+    "tauri-react": {
+      "name": "Tauri + React",
+      "description": "Native desktop app with Tauri v2 and React + TypeScript frontend",
+      "stack": "rust",
+      "category": "desktop",
+      "featured": false,
+      "command": "npm",
+      "args": ["create", "tauri-app@latest"]
+    },
+    "rust-actix": {
+      "name": "Rust Actix Web",
+      "description": "High-performance Rust web server with Actix Web + PostgreSQL",
+      "stack": "rust",
+      "category": "backend",
+      "featured": false
+    },
+    "react-vite": {
+      "name": "React + Vite",
+      "description": "Modern React with Vite, TypeScript, and shadcn/ui components",
+      "stack": "react",
+      "category": "frontend",
+      "featured": true,
+      "command": "npm",
+      "args": ["create", "vite@latest", "--template", "react-ts"]
+    },
+    "vue-nuxt": {
+      "name": "Nuxt 3",
+      "description": "Vue.js with Nuxt 3, TypeScript, and auto-imports",
+      "stack": "vue",
+      "category": "frontend",
+      "featured": false,
+      "command": "npx",
+      "args": ["nuxi@latest", "init"]
+    },
+    "expo-react-native": {
+      "name": "Expo + React Native",
+      "description": "Cross-platform mobile app with Expo, TypeScript, and navigation",
+      "stack": "react",
+      "category": "mobile",
+      "featured": false,
+      "command": "npx",
+      "args": ["create-expo-app@latest"]
+    }
+  }
+}
