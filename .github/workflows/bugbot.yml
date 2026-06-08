@@ -1,0 +1,57 @@
+name: BugBot — AI PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build kontrocode-agent
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          cargo build --release --bin kontrocode-agent
+
+      - name: Get PR diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr.diff
+          echo "DIFF_SIZE=$(wc -l < /tmp/pr.diff)" >> $GITHUB_ENV
+
+      - name: AI Review
+        if: env.DIFF_SIZE != '0'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ./target/release/kontrocode-agent review \
+            --diff /tmp/pr.diff \
+            --pr "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            > /tmp/review.json
+
+      - name: Post review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const review = JSON.parse(fs.readFileSync('/tmp/review.json', 'utf8'));
+            for (const comment of review.comments) {
+              await github.rest.pulls.createReviewComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                body: `**BugBot Review**\n\n${comment.text}\n\n_${comment.severity}_`,
+                commit_id: context.payload.pull_request.head.sha,
+                path: comment.file,
+                line: comment.line || 1,
+                side: 'RIGHT'
+              });
+            }

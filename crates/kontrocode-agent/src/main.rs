@@ -20,8 +20,11 @@ async fn main() -> anyhow::Result<()> {
 
     match mode {
         "acp" => run_acp().await,
+        "review" => run_review().await,
         _ => {
-            eprintln!("Usage: kontrocode-agent [acp]");
+            eprintln!("Usage: kontrocode-agent [acp|review]");
+            eprintln!("  acp     Run as an ACP agent (Agent Client Protocol)");
+            eprintln!("  review  Review a git diff (BugBot PR review)");
             anyhow::bail!("unknown mode: {mode}")
         }
     }
@@ -43,5 +46,21 @@ async fn run_acp() -> anyhow::Result<()> {
     tracing::info!("KontroCode ACP agent starting on stdin/stdout");
     acp::run_acp_agent(agent).await?;
 
+    Ok(())
+}
+
+async fn run_review() -> anyhow::Result<()> {
+    let args: Vec<String> = std::env::args().collect();
+    let diff_path = args.iter().position(|a| a == "--diff")
+        .and_then(|i| args.get(i + 1))
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| {
+            eprintln!("Usage: kontrocode-agent review --diff <file>");
+            std::process::exit(1);
+        });
+
+    let diff = std::fs::read_to_string(&diff_path)?;
+    let result = kontrocode_agent::bugbot::review_diff(&diff).await?;
+    println!("{}", serde_json::to_string_pretty(&result)?);
     Ok(())
 }
