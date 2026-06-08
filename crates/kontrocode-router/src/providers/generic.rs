@@ -484,3 +484,18 @@ pub fn create_fireworks() -> Option<GenericProvider> {
         header_value_prefix: "Bearer ", models_spec: fireworks_models(), model_map: identity_model,
     })
 }
+
+pub fn sonic_models() -> Vec<ModelSpec> {
+    vec![
+        ModelSpec { id: ModelId::new("sonic", "qwen2.5-coder-1.5b"), display_name: "KontroCode Sonic (Qwen Coder 1.5B)".into(), context_window: 32_768, max_output_tokens: 4_096, input_price_per_mtok: 0.0, output_price_per_mtok: 0.0, supports_tools: false, supports_streaming: true, supports_vision: false },
+        ModelSpec { id: ModelId::new("sonic", "granite-3.1-2b"), display_name: "KontroCode Sonic (Granite 2B)".into(), context_window: 4_096, max_output_tokens: 2_048, input_price_per_mtok: 0.0, output_price_per_mtok: 0.0, supports_tools: false, supports_streaming: true, supports_vision: false },
+    ]
+}
+
+pub fn create_sonic() -> Option<GenericProvider> {
+    GenericProvider::from_env(ProviderConfig {
+        id: "sonic", api_url: "http://localhost:11434/v1/chat/completions",
+        api_key_env: "OLLAMA_API_KEY", header_name: "Authorization",
+        header_value_prefix: "Bearer ", models_spec: sonic_models(), model_map: identity_model,
+    })
+}
