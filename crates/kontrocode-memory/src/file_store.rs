@@ -114,21 +114,35 @@ impl MemoryStore for FileMemoryStore {
         let profile = self.load().await?;
         let query_lower = query.to_lowercase();
         let query_words: Vec<&str> = query_lower.split_whitespace().collect();
+
+        let has_embeddings = profile.facts.iter().any(|f| f.embedding.is_some());
+
         let mut scored: Vec<(f64, Fact)> = profile
             .facts
             .into_iter()
             .map(|f| {
-                let text_lower = f.text.to_lowercase();
-                let exact = if text_lower.contains(&query_lower) { 2.0 } else { 0.0 };
-                let word_hits = query_words
-                    .iter()
-                    .filter(|w| text_lower.contains(**w))
-                    .count() as f64;
-                let score = (exact + word_hits * 0.5) * f.confidence as f64;
+                let score = if has_embeddings {
+                    let text_lower = f.text.to_lowercase();
+                    let exact = if text_lower.contains(&query_lower) { 2.0 } else { 0.0 };
+                    let word_hits = query_words
+                        .iter()
+                        .filter(|w| text_lower.contains(**w))
+                        .count() as f64;
+                    (exact + word_hits * 0.5) * f.confidence as f64
+                } else {
+                    let text_lower = f.text.to_lowercase();
+                    let exact = if text_lower.contains(&query_lower) { 3.0 } else { 0.0 };
+                    let word_hits = query_words
+                        .iter()
+                        .filter(|w| text_lower.contains(**w))
+                        .count() as f64;
+                    (exact + word_hits * 0.7) * f.confidence as f64
+                };
                 (score, f)
             })
             .filter(|(s, _)| *s > 0.0)
             .collect();
+
         scored.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
         Ok(scored.into_iter().take(top_k).map(|(_, f)| f).collect())
     }
@@ -174,6 +188,7 @@ mod tests {
             confidence: 0.9,
             created_at: Utc::now(),
             source: FactSource::Implicit,
+            embedding: None,
         };
         store.add_fact(fact).await.unwrap();
         let loaded = store.load().await.unwrap();
@@ -191,6 +206,7 @@ mod tests {
                 confidence: 0.5,
                 created_at: Utc::now(),
                 source: FactSource::Implicit,
+            embedding: None,
             })
             .await
             .unwrap();
@@ -209,6 +225,7 @@ mod tests {
                 confidence: 0.5,
                 created_at: Utc::now(),
                 source: FactSource::Implicit,
+            embedding: None,
             })
             .await
             .unwrap();

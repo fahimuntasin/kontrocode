@@ -139,6 +139,9 @@ pub struct Fact {
     pub created_at: DateTime<Utc>,
     /// Where this fact came from.
     pub source: FactSource,
+    /// Semantic embedding for RAG search. None if not yet computed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub embedding: Option<crate::embedding::Embedding>,
 }
 
 /// Provenance of a [`Fact`].
@@ -212,6 +215,7 @@ mod tests {
                 confidence: 0.9,
                 created_at: Utc::now(),
                 source: FactSource::Implicit,
+                embedding: None,
             }],
             interests: vec![],
             last_updated: Utc::now(),

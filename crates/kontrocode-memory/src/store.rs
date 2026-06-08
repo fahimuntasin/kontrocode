@@ -28,6 +28,16 @@ pub trait MemoryStore: Send + Sync {
     /// Phase 4 Redis: cosine similarity via RediSearch.
     async fn search_facts(&self, query: &str, top_k: usize) -> Result<Vec<Fact>>;
 
+    /// Search facts using an embedding for cosine similarity.
+    /// Default: falls back to empty query search.
+    async fn semantic_search(
+        &self,
+        _query_embedding: &kontrocode_core::embedding::Embedding,
+        top_k: usize,
+    ) -> Result<Vec<Fact>> {
+        self.search_facts("", top_k).await
+    }
+
     /// The path or address of the underlying storage. For diagnostics.
     fn location(&self) -> String;
 }

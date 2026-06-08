@@ -222,6 +222,7 @@ mod tests {
             confidence: 0.9,
             created_at: Utc::now(),
             source: FactSource::Explicit,
+            embedding: None,
         });
         assert_eq!(p.facts.len(), 1);
     }
